@@ -11,12 +11,14 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement | null>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null);
   const progress = useRef(0);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
+    const image = imageRef.current;
 
-    if (!section) return;
+    if (!section || !image) return;
 
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
@@ -27,6 +29,15 @@ export default function Hero() {
 
         onUpdate: (self) => {
           progress.current = self.progress;
+
+          /*
+           * Very subtle cinematic movement.
+           * The building itself does not rotate.
+           */
+          gsap.set(image, {
+            scale: 1 + self.progress * 0.055,
+            yPercent: -self.progress * 2,
+          });
         },
       });
     }, section);
@@ -37,55 +48,50 @@ export default function Hero() {
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative h-[600vh] bg-[var(--siddhi-black)]"
-    >
-      {/* STICKY HERO */}
+    <section ref={sectionRef} className="relative h-[600vh] bg-black">
+      {/* PINNED HERO */}
       <div className="sticky top-0 h-screen w-full overflow-hidden">
-        {/* HERO IMAGE */}
-        <div className="absolute inset-0">
+        {/* BACKGROUND IMAGE */}
+        <div className="absolute inset-0 overflow-hidden">
           <img
+            ref={imageRef}
             src="/images/hero/image-1.png"
-            alt="Siddhi Group architectural development"
-            className="h-full w-full object-cover object-center"
+            alt="Siddhi Group development"
+            className="h-full w-full object-cover object-center will-change-transform"
           />
-
-          <div className="absolute inset-0 bg-black/5" />
         </div>
 
-        {/* SUBTLE CENTER FRAME */}
-        <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 h-[72vh] w-[38vw] -translate-x-1/2 -translate-y-1/2 border border-white/15" />
+        {/* VERY LIGHT READABILITY */}
+        <div className="pointer-events-none absolute inset-0 bg-black/[0.04]" />
 
-        {/* TOP CENTER LABEL */}
-        <div className="absolute left-1/2 top-[118px] z-30 -translate-x-1/2 text-center">
-          <div className="font-ui text-[9px] uppercase tracking-[0.3em] text-white/75">
-            Siddhi Group
-          </div>
+        {/* NAV / CONTENT SPACE */}
+        <div className="pointer-events-none absolute inset-0">
+          {/* small architectural marker */}
+          <div className="absolute left-1/2 top-[88px] hidden h-8 w-px bg-white/30 md:block" />
 
-          <div className="font-gujarati mt-2 text-sm text-white/80">
-            સિદ્ધિ ગ્રુપ
+          {/* Hero text is interactive */}
+          <div className="pointer-events-auto">
+            <HeroText states={heroStates} progress={progress} />
           </div>
         </div>
-
-        {/* STORY TEXT */}
-        <HeroText states={heroStates} progress={progress} />
 
         {/* BOTTOM LEFT */}
-        <div className="absolute bottom-8 left-7 z-40 font-ui text-[9px] uppercase leading-[1.5] tracking-[0.18em] text-white/75 md:left-10 lg:left-14">
-          Rajkot
-          <br />
-          Gujarat
+        <div className="absolute bottom-8 left-7 z-40 md:left-10 lg:left-14">
+          <div className="font-ui text-[9px] uppercase leading-[1.5] tracking-[0.18em] text-white/70">
+            Rajkot
+            <br />
+            Gujarat
+          </div>
         </div>
 
         {/* SCROLL INDICATOR */}
         <div className="absolute bottom-7 left-1/2 z-40 flex -translate-x-1/2 flex-col items-center">
-          <span className="mb-3 font-ui text-[9px] uppercase tracking-[0.25em] text-white/85">
+          <span className="mb-3 font-ui text-[9px] uppercase tracking-[0.25em] text-white/80">
             Scroll
           </span>
 
-          <div className="relative h-12 w-6 rounded-full border border-white/70">
-            <span className="absolute left-1/2 top-2 h-2 w-1 -translate-x-1/2 rounded-full bg-text-white" />
+          <div className="relative h-11 w-5 rounded-full border border-white/60">
+            <span className="absolute left-1/2 top-2 h-2 w-1 -translate-x-1/2 rounded-full bg-[var(--siddhi-red)]" />
           </div>
         </div>
       </div>
